@@ -3,9 +3,30 @@
 version: 2.1
 
 workflows:
-  search-workflow:
+  manual:
     jobs:
       - search
+  weekday:
+    triggers:
+      - schedule:
+          cron: "0 8,10,12,14,16,18,20 * * 1-5" # UTC
+          filters:
+            branches:
+              only:
+                - main
+    jobs:
+      - search
+  weekend:
+    triggers:
+      - schedule:
+          cron: "0 12,19 * * 6,0" # UTC
+          filters:
+            branches:
+              only:
+                - main
+    jobs:
+      - search
+  
 
 jobs:
   search:
