@@ -9,7 +9,7 @@ workflows:
   weekday:
     triggers:
       - schedule:
-          cron: "0 8,10,12,14,16,18,20 * * 1-5" # UTC
+          cron: "0 7,9,11,13,15,17,19 * * 1-5" # UTC
           filters:
             branches:
               only:
