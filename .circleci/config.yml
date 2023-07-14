@@ -5,7 +5,10 @@ version: 2.1
 workflows:
   manual:
     jobs:
-      - search
+      - search:
+          context:
+            - GitLab Docker
+
   # weekday:
   #   triggers:
   #     - schedule:
@@ -32,7 +35,7 @@ jobs:
     docker:
       - image: registry.gitlab.com/m-c-moore/flat-finder/ff-release:latest
         auth:
-          username: $DOCKER_USER
+          username: $DOCKER_USERNAME
           password: $DOCKER_PASSWORD
     steps:
       # https://circleci.com/docs/2.0/env-vars/#encoding-multi-line-environment-variables
