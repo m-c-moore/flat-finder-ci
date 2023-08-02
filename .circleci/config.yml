@@ -2,40 +2,45 @@
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
+search-job: &search-job
+  jobs:
+    - search:
+        context:
+          - GitLab Docker
+
+schedule-filter: &schedule-filter
+  filters:
+    branches:
+      only:
+        - main
+
 workflows:
   manual:
-    jobs:
-      - search
-  # weekday:
-  #   triggers:
-  #     - schedule:
-  #         cron: "0 7-19 * * 1-5" # UTC
-  #         filters:
-  #           branches:
-  #             only:
-  #               - main
-  #   jobs:
-  #     - search
-  # weekend:
-  #   triggers:
-  #     - schedule:
-  #         cron: "0 9,14,19 * * 6,0" # UTC
-  #         filters:
-  #           branches:
-  #             only:
-  #               - main
-  #   jobs:
-  #     - search
+    <<: *search-job
+
+  weekday:
+    triggers:
+      - schedule:
+          cron: "0 7,9,11,13,15,17,19 * * 1-5" # UTC
+          <<: *schedule-filter
+    <<: *search-job
+
+  weekend:
+    triggers:
+      - schedule:
+          cron: "0 9,14,19 * * 6,0" # UTC
+          <<: *schedule-filter
+    <<: *search-job
 
 jobs:
   search:
     docker:
-      - image: registry.gitlab.com/m-c-moore/flat-finder/selenium:latest
+      - image: registry.gitlab.com/m-c-moore/flat-finder/ff-release:latest
         auth:
-          username: $DOCKER_USER
+          username: $DOCKER_USERNAME
           password: $DOCKER_PASSWORD
     steps:
       # https://circleci.com/docs/2.0/env-vars/#encoding-multi-line-environment-variables
       - run: |
-          cd /server
-          FB_PRIVATE_KEY=$(echo $FB_PRIVATE_KEY_64 | base64 -d) python -m main
+          cd /code/server
+          FB_PRIVATE_KEY=$(echo $FB_PRIVATE_KEY_64 | base64 -d) poetry run python -m main
