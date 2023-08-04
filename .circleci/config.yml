@@ -15,9 +15,6 @@ schedule-filter: &schedule-filter
         - main
 
 workflows:
-  manual:
-    <<: *search-job
-
   weekday:
     triggers:
       - schedule:
