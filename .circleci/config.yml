@@ -15,19 +15,9 @@ schedule-filter: &schedule-filter
         - main
 
 workflows:
-  weekday:
-    triggers:
-      - schedule:
-          cron: "0 7,9,11,13,15,17,19 * * 1-5" # UTC
-          <<: *schedule-filter
+  manual:
     <<: *search-job
-
-  weekend:
-    triggers:
-      - schedule:
-          cron: "0 9,14,19 * * 6,0" # UTC
-          <<: *schedule-filter
-    <<: *search-job
+# no active searches
 
 jobs:
   search:
