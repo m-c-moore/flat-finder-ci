@@ -1,0 +1,52 @@
+name: Schedule
+
+on:
+  schedule:  # https://crontab.guru/
+    - cron: "0 7-19/1 * * 1-5" # UTC
+    - cron: "0 8-18/5 * * 0,6" # UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  search:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1password
+      - uses: 1password/load-secrets-action@v3
+        with:
+          export-env: true
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          PERSONAL_ACCESS_TOKEN: op://Developer/Flat Finder GitHub Actions/credential
+          EMAIL_PASSWORD: op://Developer/Google (dev)/password
+          LOGFIRE_TOKEN: op://Developer/Flat Finder Logfire/credential
+          FB_PRIVATE_KEY_ID: op://Developer/Flat Finder Firebase/credential
+          FB_PRIVATE_KEY_BASE64: op://Developer/Flat Finder Firebase/private key base64
+
+      # clone
+      - uses: actions/checkout@v4
+        with:
+          repository: m-c-moore/flat-finder
+          token: ${{ env.PERSONAL_ACCESS_TOKEN }}
+
+      # set up
+      - uses: astral-sh/setup-uv@v5
+      - run: uv python install
+      - run: uv sync --no-dev -v
+
+      # playwright
+      - name: Load cached playwright
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('uv.lock') }}
+      - run: uv run playwright install chromium-headless-shell
+
+      # run
+      - name: Run searches
+        run: FB_PRIVATE_KEY="$(echo "$FB_PRIVATE_KEY_BASE64" | base64 -d)" uv run python -m server
+        env:
+          ENVIRONMENT: production
