@@ -21,10 +21,10 @@ jobs:
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           PERSONAL_ACCESS_TOKEN: op://Developer/Flat Finder GitHub Actions/credential
-          EMAIL_PASSWORD: op://Developer/Google (dev)/password
-          LOGFIRE_TOKEN: op://Developer/Flat Finder Logfire/credential
-          FB_PRIVATE_KEY_ID: op://Developer/Flat Finder Firebase/credential
-          FB_PRIVATE_KEY_BASE64: op://Developer/Flat Finder Firebase/private key base64
+          EMAIL__PASSWORD: op://Developer/Google (dev)/password
+          LOGFIRE__TOKEN: op://Developer/Flat Finder Logfire/credential
+          FIREBASE__PRIVATE_KEY_ID: op://Developer/Flat Finder Firebase/credential
+          FIREBASE_PRIVATE_KEY_BASE64: op://Developer/Flat Finder Firebase/private key base64
 
       # clone
       - uses: actions/checkout@v4
@@ -47,6 +47,6 @@ jobs:
 
       # run
       - name: Run searches
-        run: FB_PRIVATE_KEY="$(echo "$FB_PRIVATE_KEY_BASE64" | base64 -d)" uv run python -m server
+        run: FIREBASE__PRIVATE_KEY="$(echo "$FIREBASE_PRIVATE_KEY_BASE64" | base64 -d)" uv run python -m server
         env:
           ENVIRONMENT: production
